@@ -12,3 +12,11 @@ Example:
 ```
 python app.py google
 ```
+#Return result
+
+````
+User: google 
+User ID : 20536157
+Follower count : 13124207
+Friend count : 439
+```
