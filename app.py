@@ -1,8 +1,11 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import tweepy
 import ConfigParser
 import sys
+import sqlite3
+from datetime import datetime
 
 
 class TwitterRoi():
@@ -11,6 +14,19 @@ class TwitterRoi():
     """
 
     def __init__(self, name):
+        """
+        Initalize the TwitterRoi class.
+        :param name:
+        :return:
+        """
+        # Create a Db connection
+        self.conn = sqlite3.connect('twitter.db')
+        self.curs = self.conn.cursor()
+        # Create table.
+        # self.conn.execute('''CREATE TABLE twitter_account (user int , name text, screen_name text)''')
+        # self.conn.execute(
+        #    '''CREATE TABLE twitter_account_data
+        #    (user int , data text, followers int, favourite int, friend int, statuses int)''')
         config = ConfigParser.ConfigParser()
         config.read('config.ini')
         section = 'Twitter'
@@ -32,17 +48,25 @@ class TwitterRoi():
         Function to get twitter account data.
         :return:
         """
+
         try:
             search_result = self.api.search_users(name, 1, 1)
             for user in search_result:
-                print "User: %s " % user.screen_name
                 print "User ID : %s" % user.id
+                user_name = user.name
+                user_screen_name = user.screen_name
                 self.user_id = user.id
-                print "Follower count : %d" % user.followers_count
-                if hasattr(user, 'favourites_count'):
-                    print "Favorite count : %d" % user.favourites_count
-                print "Friend count : %d" % user.friends_count
-                print "Statuses count : %d" % user.statuses_count
+
+                self.curs.execute("SELECT user FROM twitter_account where user=:uid", self.user_id)
+                data = self.curs.fetchone()
+                if data is None:
+                    self.curs.execute("INSERT INTO twitter_account VALUES(?, ?, ?)",
+                                      (self.user_id, user_name, user_screen_name))
+
+                self.curs.execute("INSERT INTO twitter_account_data VALUES(?,?,?,?,?,?)",
+                                  (self.user_id, datetime.today(), user.followers_count, user.favourites_count,
+                                   user.friends_count, user.statuses_count))
+                self.conn.commit()
         except StandardError:
             print 'Mining account error'
 
@@ -52,7 +76,7 @@ class TwitterRoi():
         :return:
         """
         try:
-            args = {'id': self.user_id }
+            args = {'id': self.user_id}
             tweet_list = self.api.user_timeline(**args)
             for tweet in tweet_list:
                 print "-----------------------"
@@ -65,10 +89,20 @@ class TwitterRoi():
         except StandardError:
             print "Mining tweets error"
 
+    def get_data(self):
+        data = self.curs.execute('SELECT * FROM twitter_account')
+        print data.fetchall()
+
+        data2 = self.curs.execute('SELECT * FROM twitter_account_data')
+        print data2.fetchall()
+
 
 if __name__ == "__main__":
+    name = ''
     for arg in sys.argv:
         name = arg
     twitter_roi = TwitterRoi(name)
     twitter_roi.mining_account()
     twitter_roi.mining_tweets()
+
+    twitter_roi.get_data()
