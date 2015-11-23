@@ -8,6 +8,6 @@ A twitter spider
 #Usage:
 python app.py <screen name>
 
-'''
+```
 python app.py google
-'''
+```
