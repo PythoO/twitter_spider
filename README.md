@@ -6,8 +6,9 @@ A twitter spider
 <strong>request security</strong> : pip install 'requests[security]'
 
 #Usage:
-python app.py <screen name>
-
+python app.py screen_name
+<br>
+Example:
 ```
 python app.py google
 ```
