@@ -1,4 +1,5 @@
-# twitter_spider
+# t
+Twitter Spider
 A twitter spider to parse some twitter data.
 
 # Require:
