@@ -2,5 +2,5 @@
 A twitter spider
 
 # Require
-tweepy : pip install tweepy<br>
-request security : pip install 'requests[security]'
+<strong>tweepy</strong> : pip install tweepy<br>
+<strong>request security</strong> : pip install 'requests[security]'
