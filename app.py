@@ -8,7 +8,7 @@ import sqlite3
 from datetime import datetime
 
 
-class TwitterRoi():
+class TwitterSpider():
     """
     The main class to make some data mining in twitter.
     """
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     name = ''
     for arg in sys.argv:
         name = arg
-    twitter_roi = TwitterRoi(name)
+    twitter_roi = TwitterSpider(name)
     twitter_roi.mining_account()
     twitter_roi.mining_tweets()
 
