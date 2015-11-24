@@ -22,11 +22,16 @@ class TwitterSpider():
         # Create a Db connection
         self.conn = sqlite3.connect('twitter.db')
         self.curs = self.conn.cursor()
+        
         # Create table.
-        # self.conn.execute('''CREATE TABLE twitter_account (user int , name text, screen_name text)''')
+        # self.conn.execute('''CREATE TABLE twitter_account (id int primary key, user int , user_name text, user_screen_name text)''')
         # self.conn.execute(
         #    '''CREATE TABLE twitter_account_data
-        #    (user int , data text, followers int, favourite int, friend int, statuses int)''')
+        #    (id int primary key, account_id int, date text, followers int, favourites int, friends int, statuses int)''')
+        # self.conn.execute(
+        #    '''CREATE TABLE twitter_tweet_data
+        #    (id int primary key, account_id int, tweet_id int, date text, favorite int, lang text, retweet int)''')
+        
         config = ConfigParser.ConfigParser()
         config.read('config.ini')
         section = 'Twitter'
@@ -62,7 +67,7 @@ class TwitterSpider():
                 if data is None:
                     self.curs.execute("INSERT INTO twitter_account VALUES(?, ?, ?)",
                                       (self.user_id, user_name, user_screen_name))
-
+                                      
                 self.curs.execute("INSERT INTO twitter_account_data VALUES(?,?,?,?,?,?)",
                                   (self.user_id, datetime.today(), user.followers_count, user.favourites_count,
                                    user.friends_count, user.statuses_count))
@@ -79,13 +84,9 @@ class TwitterSpider():
             args = {'id': self.user_id}
             tweet_list = self.api.user_timeline(**args)
             for tweet in tweet_list:
-                print "-----------------------"
-                print "\t Tweet created at : %s" % tweet.created_at
-                print "\t Tweet favorite count (like) : %d" % tweet.favorite_count
-                print "\t Tweet id : %d" % tweet.id
-                print "\t Tweet lang %s" % tweet.lang
-                print "\t Tweet retweet count : %d" % tweet.retweet_count
-                print "\t Tweet text : %s" % tweet.text
+                self.curs.execute("INSERT INTO twitter_tweet_data VALUES(?,?,?,?,?,?,?)",
+                (self.user_id, tweet.id, tweet.created_at, tweet.favorite_count, tweet.lang, tweet.retweet_count))
+                self.conn.commit()
         except StandardError:
             print "Mining tweets error"
 
