@@ -4,8 +4,7 @@
 import tweepy
 import ConfigParser
 import sys
-import sqlite3
-from datetime import datetime
+import time
 
 
 class TwitterSpider():
@@ -19,19 +18,6 @@ class TwitterSpider():
         :param name:
         :return:
         """
-        # Create a Db connection
-        self.conn = sqlite3.connect('twitter.db')
-        self.curs = self.conn.cursor()
-        
-        # Create table.
-        # self.conn.execute('''CREATE TABLE twitter_account (id int primary key, user int , user_name text, user_screen_name text)''')
-        # self.conn.execute(
-        #    '''CREATE TABLE twitter_account_data
-        #    (id int primary key, account_id int, date text, followers int, favourites int, friends int, statuses int)''')
-        # self.conn.execute(
-        #    '''CREATE TABLE twitter_tweet_data
-        #    (id int primary key, account_id int, tweet_id int, date text, favorite int, lang text, retweet int)''')
-        
         config = ConfigParser.ConfigParser()
         config.read('config.ini')
         section = 'Twitter'
@@ -61,17 +47,6 @@ class TwitterSpider():
                 user_name = user.name
                 user_screen_name = user.screen_name
                 self.user_id = user.id
-
-                self.curs.execute("SELECT user FROM twitter_account where user=:uid", self.user_id)
-                data = self.curs.fetchone()
-                if data is None:
-                    self.curs.execute("INSERT INTO twitter_account VALUES(?, ?, ?)",
-                                      (self.user_id, user_name, user_screen_name))
-                                      
-                self.curs.execute("INSERT INTO twitter_account_data VALUES(?,?,?,?,?,?)",
-                                  (self.user_id, datetime.today(), user.followers_count, user.favourites_count,
-                                   user.friends_count, user.statuses_count))
-                self.conn.commit()
         except StandardError:
             print 'Mining account error'
 
@@ -84,26 +59,19 @@ class TwitterSpider():
             args = {'id': self.user_id}
             tweet_list = self.api.user_timeline(**args)
             for tweet in tweet_list:
-                self.curs.execute("INSERT INTO twitter_tweet_data VALUES(?,?,?,?,?,?,?)",
-                (self.user_id, tweet.id, tweet.created_at, tweet.favorite_count, tweet.lang, tweet.retweet_count))
-                self.conn.commit()
+                print "#####"
+                print tweet.id
         except StandardError:
             print "Mining tweets error"
-
-    def get_data(self):
-        data = self.curs.execute('SELECT * FROM twitter_account')
-        print data.fetchall()
-
-        data2 = self.curs.execute('SELECT * FROM twitter_account_data')
-        print data2.fetchall()
 
 
 if __name__ == "__main__":
     name = ''
     for arg in sys.argv:
         name = arg
-    twitter_roi = TwitterSpider(name)
-    twitter_roi.mining_account()
-    twitter_roi.mining_tweets()
 
-    twitter_roi.get_data()
+    while True:
+        twitter_roi = TwitterSpider(name)
+        twitter_roi.mining_account()
+        twitter_roi.mining_tweets()
+        time.sleep(10)
