@@ -4,10 +4,33 @@
 import tweepy
 import ConfigParser
 import sys
-import time
+import sqlalchemy as sqla
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String
+
+engine = sqla.create_engine('sqlite:///tutorial.db', echo=False)
+connection = engine.connect()
+Base = declarative_base()
+Session = sessionmaker()
 
 
-class TwitterSpider():
+class Account(Base):
+    __tablename__ = 'accounts'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    user_id = Column(Integer)
+
+    def __repr__(self):
+        return "<Accounts(name= '%s', user_id='%d')>" % (self.name, self.user_id)
+
+#Base.metadata.create_all(engine)
+Session.configure(bind=engine)
+session = Session()
+
+
+class TwitterSpider:
     """
     The main class to make some data mining in twitter.
     """
@@ -18,35 +41,49 @@ class TwitterSpider():
         :param name:
         :return:
         """
+        self.api = None
+        self.engine = None
+        self.name = name
+        self.user_id = None
+        self.session = None
+        try:
+            self.get_config()
+        except StandardError:
+            print "Cannot get config"
+
+        try:
+            self.get_connection()
+        except StandardError:
+            print "Cannot get connection"
+
+    def get_config(self):
+        self.api = None
         config = ConfigParser.ConfigParser()
         config.read('config.ini')
         section = 'Twitter'
-
         consumer_key = config.get(section, 'consumer_key')
         consumer_secret = config.get(section, 'consumer_secret')
         access_token = config.get(section, 'access_token')
         access_token_secret = config.get(section, 'access_token_secret')
-
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
-
         self.api = tweepy.API(auth)
-        self.name = name
-        self.user_id = int
 
     def mining_account(self):
         """
         Function to get twitter account data.
         :return:
         """
-
         try:
-            search_result = self.api.search_users(name, 1, 1)
-            for user in search_result:
-                print "User ID : %s" % user.id
-                user_name = user.name
-                user_screen_name = user.screen_name
-                self.user_id = user.id
+            if self.name is not None:
+                search_result = self.api.search_users(self.name, 1, 1)
+                for user in search_result:
+                    account = Account(name=user.name, user_id=user.id)
+                    session.add(account)
+                    session.commit()
+            for account in session.query(Account):
+                print "%s | %d " % (account.name, account.user_id)
+
         except StandardError:
             print 'Mining account error'
 
@@ -66,12 +103,11 @@ class TwitterSpider():
 
 
 if __name__ == "__main__":
-    name = ''
-    for arg in sys.argv:
-        name = arg
+    name = None
+    if len(sys.argv) > 1:
+        name = sys.argv[1]
 
-    while True:
-        twitter_roi = TwitterSpider(name)
-        twitter_roi.mining_account()
-        twitter_roi.mining_tweets()
-        time.sleep(10)
+    #while True:
+    twitter_roi = TwitterSpider(name)
+    twitter_roi.mining_account()
+    #twitter_roi.mining_tweets()

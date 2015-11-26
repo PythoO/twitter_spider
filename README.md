@@ -5,6 +5,7 @@ A twitter spider to parse some twitter data.
 #Require:
 <strong>tweepy</strong> : pip install tweepy<br>
 <strong>request security</strong> : pip install 'requests[security]'
+<strong>SQLAlchemy</strong> : pip install SQLAlchemy
 
 You need to create a config.ini file in your root folder. It must be like this.
 ````
