@@ -35,17 +35,16 @@ class TwitterSpider:
     The main class to make some data mining in twitter.
     """
 
-    def __init__(self, name):
+    name = None
+    api = None
+
+    def __init__(self):
         """
         Initalize the TwitterRoi class.
         :param name:
         :return:
         """
-        self.api = None
-        self.engine = None
-        self.name = name
-        self.user_id = None
-        self.session = None
+
         try:
             self.get_config()
         except StandardError:
@@ -56,8 +55,13 @@ class TwitterSpider:
         except StandardError:
             print "Cannot get connection"
 
+    def set_name(self, name):
+        self.name = name
+
+    def set_api(self, api):
+        self.api = api
+
     def get_config(self):
-        self.api = None
         config = ConfigParser.ConfigParser()
         config.read('config.ini')
         section = 'Twitter'
@@ -67,7 +71,7 @@ class TwitterSpider:
         access_token_secret = config.get(section, 'access_token_secret')
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
-        self.api = tweepy.API(auth)
+        self.set_api(tweepy.API(auth))
 
     def mining_account(self):
         """
@@ -81,11 +85,14 @@ class TwitterSpider:
                     account = Account(name=user.name, user_id=user.id)
                     session.add(account)
                     session.commit()
-            for account in session.query(Account):
-                print "%s | %d " % (account.name, account.user_id)
-
+            print "Account : %s added" % self.name
         except StandardError:
             print 'Mining account error'
+
+    @staticmethod
+    def get_all_accounts():
+        for account in session.query(Account):
+            print "%s | %d " % (account.name, account.user_id)
 
     def mining_tweets(self):
         """
@@ -95,7 +102,7 @@ class TwitterSpider:
         try:
             args = {'id': self.user_id}
             tweet_list = self.api.user_timeline(**args)
-            for tweet in tweet_list:
+            for tweet in tweet_list:git
                 print "#####"
                 print tweet.id
         except StandardError:
@@ -103,11 +110,15 @@ class TwitterSpider:
 
 
 if __name__ == "__main__":
-    name = None
+
+    twitter_roi = TwitterSpider()
+
     if len(sys.argv) > 1:
         name = sys.argv[1]
+        twitter_roi.set_name(name)
+        twitter_roi.mining_account()
+        #sys.exit()
 
-    #while True:
-    twitter_roi = TwitterSpider(name)
-    twitter_roi.mining_account()
+    twitter_roi.get_all_accounts()
+
     #twitter_roi.mining_tweets()
