@@ -102,7 +102,7 @@ class TwitterSpider:
         try:
             args = {'id': self.user_id}
             tweet_list = self.api.user_timeline(**args)
-            for tweet in tweet_list:git
+            for tweet in tweet_list:
                 print "#####"
                 print tweet.id
         except StandardError:
