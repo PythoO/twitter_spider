@@ -1,40 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import tweepy
-import ConfigParser
+
 import sys
-import sqlalchemy as sqla
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Column, Integer, String
-
-engine = sqla.create_engine('sqlite:///tutorial.db', echo=False)
-connection = engine.connect()
-Base = declarative_base()
-Session = sessionmaker()
-
-
-class Account(Base):
-    __tablename__ = 'accounts'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    user_id = Column(Integer)
-
-    def __repr__(self):
-        return "<Accounts(name= '%s', user_id='%d')>" % (self.name, self.user_id)
-
-#Base.metadata.create_all(engine)
-Session.configure(bind=engine)
-session = Session()
-
+from models import *
 
 class TwitterSpider:
     """
     The main class to make some data mining in twitter.
     """
-
     name = None
     api = None
 
@@ -62,16 +36,7 @@ class TwitterSpider:
         self.api = api
 
     def get_config(self):
-        config = ConfigParser.ConfigParser()
-        config.read('config.ini')
-        section = 'Twitter'
-        consumer_key = config.get(section, 'consumer_key')
-        consumer_secret = config.get(section, 'consumer_secret')
-        access_token = config.get(section, 'access_token')
-        access_token_secret = config.get(section, 'access_token_secret')
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
-        self.set_api(tweepy.API(auth))
+
 
     def mining_account(self):
         """
