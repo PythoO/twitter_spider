@@ -7,7 +7,7 @@ from models import *
 from twitter_api import *
 
 
-class SpiderTweet():
+class SpiderTweet:
     def __init__(self):
         print "Call me spider tweet"
 
@@ -19,6 +19,7 @@ class SpiderTweet():
     def mining_tweets(uid):
         """
         Function to get tweets data.
+        :param uid
         :return:
         """
         try:
@@ -37,7 +38,8 @@ class SpiderTweet():
     @staticmethod
     def get_tweets():
         for tweet in session.query(Tweet).order_by(Tweet.tid):
-            print "%d | %s | %d | %d : %s" % (tweet.tid, tweet.favorite_count, tweet.retweet_count, tweet.uid, tweet.text)
+            print "%d | %s | %d | %d : %s" % (
+                tweet.tid, tweet.favorite_count, tweet.retweet_count, tweet.uid, tweet.text)
 
 
 if __name__ == '__main__':
