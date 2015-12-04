@@ -17,26 +17,31 @@ class SpiderAccount:
     def __init__(self):
         print "Call me spider add."
 
-    @staticmethod
-    def mining_account(name):
+    def mining_account(self, name):
         """
         Function to get account information and then record it in the DB.
         :param name:
         :return account id:
         """
         try:
-            search_result = twitter_api.search_users(name, 1, 1)
-            for user in search_result:
-                now = datetime.datetime.now()
-                account = Account(name=user.name, uid=user.id, description=user.description, tags='', created_at=now,
-                                  updated_at=now)
-                session.add(account)
-                session.commit()
-
-                return user.id
+            if isinstance(int(name), int):
+                user = twitter_api.get_user(name)
+                self.insert_account(user)
+            else:
+                search_result = twitter_api.search_users(name, 1, 1)
+                for user in search_result:
+                    self.insert_account(user)
 
         except StandardError, e:
             print e.message
+
+    @staticmethod
+    def insert_account(user):
+        now = datetime.datetime.now()
+        account = Account(name=user.name, uid=user.id, description=user.description, tags='', created_at=now,
+                      updated_at=now)
+        session.add(account)
+        session.commit()
 
     @staticmethod
     def update_account_data():
