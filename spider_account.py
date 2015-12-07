@@ -1,12 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import argparse
+import datetime
 import sys
+import time
+
 from models import *
 from twitter_api import *
-import datetime
-import argparse
-import time
 
 
 class SpiderAccount:
@@ -24,7 +25,7 @@ class SpiderAccount:
         :return account id:
         """
         try:
-            if isinstance(int(name), int):
+            if isinstance(name, int):
                 user = twitter_api.get_user(name)
                 self.insert_account(user)
             else:
@@ -39,7 +40,7 @@ class SpiderAccount:
     def insert_account(user):
         now = datetime.datetime.now()
         account = Account(name=user.name, uid=user.id, description=user.description, tags='', created_at=now,
-                      updated_at=now)
+                          updated_at=now)
         session.add(account)
         session.commit()
 
@@ -69,6 +70,9 @@ class SpiderAccount:
             print "Favourite : %d :" % account.favourites_count
             print "Followers : %d :" % account.followers_count
 
+    @staticmethod
+    def get_total_accounts():
+        return session.query(Account).count()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
