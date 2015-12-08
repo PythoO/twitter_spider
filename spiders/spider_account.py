@@ -57,6 +57,7 @@ class SpiderAccount:
                                        updated_at=now)
             session.add(account_data)
             session.commit()
+        return True
 
     @staticmethod
     def get_accounts():
