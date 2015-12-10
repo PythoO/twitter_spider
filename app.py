@@ -1,10 +1,16 @@
 import tkMessageBox
 from Tkinter import *
 
+<<<<<<< HEAD
 import os
 from PIL import Image, ImageTk
 from spider_account import *
 from spider_tweet import *
+=======
+from spiders.spider_account import *
+from spiders.spider_tweet import *
+
+>>>>>>> 7180f1bfcbf2a6be336f8763f291237bb566379f
 
 
 class Application(Frame):
@@ -18,6 +24,7 @@ class Application(Frame):
 
         menu_file = Menu(menubar)
         menu_file.add_command(label="New Twitter Account", command=self.new)
+        menu_file.add_command(label="Update Twitter Accounts", command=self.update)
         menu_file.add_separator()
         menu_file.add_command(label='Quit', command=self.quit_app)
         menubar.add_cascade(label='File', menu=menu_file)
@@ -64,6 +71,10 @@ class Application(Frame):
         self.listbox_accounts = Listbox(self.frame_left, fg="#FFFFFF", bg="#313131")
         self.listbox_accounts.pack(fill=X)
 
+        # Main Frame Text
+        self.main_text = Text(self.frame_middle)
+        self.main_text.pack(expand=True)
+
     def quit_app(self):
         self.quit()
 
@@ -75,6 +86,13 @@ class Application(Frame):
         self.account_id.pack()
         self.account_insert = Button(self.frame_middle, text="Create", command=self.insert_account)
         self.account_insert.pack()
+    
+    def update(self):
+        self.main_text.delete(1.0, END)
+        self.main_text.insert(END, 'Updating')
+        response = self.spider_account.update_account_data()
+        if response:
+            self.main_text.insert(END, 'Update accounts done.')
 
     def insert_account(self):
         name = self.account_id.get()
@@ -87,14 +105,25 @@ class Application(Frame):
         text = "Total Accounts : %d" % total_accounts
         self.listbox_accounts.insert(END, text)
         for account in session.query(Account).order_by(Account.name):
+<<<<<<< HEAD
             self.listbox_accounts.insert(END, account.name)
+=======
+                self.listbox_accounts.insert(account.id, account.name)
+>>>>>>> 7180f1bfcbf2a6be336f8763f291237bb566379f
         self.account_view = Button(self.frame_left, text="view account", command=self.view_account)
         self.account_view.pack()
 
     def view_account(self):
-        name = self.listbox_accounts.curselection()
-        account_name = Label(self.frame_middle, text=name)
-        self.pack = account_name.pack()
+        listbox_index = self.listbox_accounts.curselection()
+        account_name = self.listbox_accounts.get(listbox_index)
+        account = session.query(Account).filter_by(name=account_name).first()
+        accountdata = session.query(AccountData).filter_by(uid=account.uid).first()
+        self.main_text.delete(1.0, END)
+        self.main_text.insert(END, 'Account name : %s\n' % account.name)
+        self.main_text.insert(END, 'Description : %s\n' % account.description)
+        if accountdata is not None:
+            self.main_text.insert(END, 'Favourite : %s\n' % accountdata.favourites_count)
+            self.main_text.insert(END, 'Followers : %s\n' % accountdata.followers_count)
 
     def help(self):
         tkMessageBox.showinfo("About", "bla bla")

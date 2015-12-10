@@ -3,7 +3,8 @@
 
 import sys
 import time
-from models import *
+
+from spiders.models import *
 from twitter_api import *
 
 
