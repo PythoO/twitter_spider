@@ -1,12 +1,17 @@
-from Tkinter import *
 import tkMessageBox
+from Tkinter import *
+
+import os
+from PIL import Image, ImageTk
 from spider_account import *
 from spider_tweet import *
 
+
 class Application(Frame):
+    DARK_BG = '#313131'
+    LIGHT_BG = '#646464'
 
     def create_widgets(self):
-
         # Menus
         menubar = Menu(self.master, tearoff=False)
         self.master.config(menu=menubar)
@@ -22,17 +27,38 @@ class Application(Frame):
         menubar.add_cascade(label='Help', menu=menu_help)
 
         # Header
-        frame_top = Frame(self.master, height=100, relief=GROOVE, background='#646464')
+        frame_top = Frame(self.master, height=100, width=800, relief=GROOVE, background=self.DARK_BG)
         frame_top.pack(side=TOP, fill=X)
+
+        # Logo
+        logo_img = ImageTk.PhotoImage(Image.open(os.path.dirname(__file__) + "/128.ico"))
+        logo = Button(frame_top, compound=LEFT, image=logo_img, text="Squid", bg=self.DARK_BG,
+                      activebackground=self.LIGHT_BG, height=50, bd=0, padx=0, pady=0, relief=FLAT)
+        logo.img = logo_img
+        logo.grid(row=0, column=0)
+        # Header Buttons
+        btn_img = ImageTk.PhotoImage(Image.open(os.path.dirname(__file__) + "/squid.gif"))
+        conf_btn = Button(frame_top, compound=LEFT, image=btn_img, text='Configuration', bg=self.DARK_BG,
+                          activebackground=self.LIGHT_BG)
+        conf_btn.img = btn_img
+        conf_btn.grid(row=0, column=1)
+        publish_btn = Button(frame_top, compound=LEFT, image=btn_img, text='Pubishing')
+        publish_btn.grid(row=0, column=2)
+        report_btn = Button(frame_top, compound=LEFT, image=btn_img, text='Reports')
+        report_btn.grid(row=0, column=3)
+
         # Frame Left
-        self.frame_left = Frame(self.master, width=200, borderwidth=1, relief=GROOVE, background='#313131')
+        self.frame_left = Frame(self.master, width=200, height=500, borderwidth=1, relief=GROOVE,
+                                background=self.LIGHT_BG)
         self.frame_left.pack(side=LEFT, fill=Y, expand=False)
+
         # Frame Middle
-        self.frame_middle = Frame(self.master, borderwidth=1, relief=GROOVE)
-        self.frame_middle.pack(fill=Y)
+        self.frame_middle = Frame(self.master, borderwidth=1, relief=GROOVE, width=600, height=500)
+        self.frame_middle.pack(side=RIGHT, fill=BOTH)
+
         # Frame Right
-        #self.frame_right = Frame(self.master, width=200, borderwidth=1, relief=GROOVE, background='#646464')
-        #self.frame_right.pack(side=LEFT, fill=Y, expand=False)
+        # self.frame_right = Frame(self.master, width=200, borderwidth=1, relief=GROOVE, background='#646464')
+        # self.frame_right.pack(side=LEFT, fill=Y, expand=False)
 
         # Twitter accounts
         self.listbox_accounts = Listbox(self.frame_left, fg="#FFFFFF", bg="#313131")
@@ -61,7 +87,7 @@ class Application(Frame):
         text = "Total Accounts : %d" % total_accounts
         self.listbox_accounts.insert(END, text)
         for account in session.query(Account).order_by(Account.name):
-                self.listbox_accounts.insert(END, account.name)
+            self.listbox_accounts.insert(END, account.name)
         self.account_view = Button(self.frame_left, text="view account", command=self.view_account)
         self.account_view.pack()
 
@@ -86,9 +112,10 @@ class Application(Frame):
         self.feed_initial_data()
 
 
-
 root = Tk()
-root.title('Spiders')
+root.minsize(width=800, height=600)
+root.wm_iconbitmap("128.exr")
+root.title('Squid')
 root.minsize(width=800, height=600)
 app = Application(master=root)
 app.mainloop()
