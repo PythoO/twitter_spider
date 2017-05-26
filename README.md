@@ -18,7 +18,7 @@ access_token_secret = your_key
 
 #Usage:
 python app.py screen_name
-<br>
+
 Example:
 ```
 python app.py google
@@ -26,7 +26,7 @@ python app.py google
 #Return result:
 
 ````
-User: google 
+User: google
 User ID : 20536157
 Follower count : 13124207
 Friend count : 439
