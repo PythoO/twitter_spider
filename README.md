@@ -1,8 +1,8 @@
-#Twitter Spider
+# Twitter Spider
 Twitter Spider
 A twitter spider to parse some twitter data.
 
-#Require:
+# Require:
 <strong>tweepy</strong> : pip install tweepy<br>
 <strong>request security</strong> : pip install 'requests[security]'
 <strong>SQLAlchemy</strong> : pip install SQLAlchemy
@@ -17,7 +17,7 @@ access_token = your_key
 access_token_secret = your_key
 ```
 
-#Usage:
+# Usage:
 python app.py screen_name
 
 Example:
@@ -26,9 +26,9 @@ Example:
 python app.py google
 ```
 
-#Return result:
+# Return result:
 
-````
+```
 User: google
 User ID : 20536157
 Follower count : 13124207
