@@ -9,7 +9,7 @@ A twitter spider to parse some twitter data.
 
 You need to create a config.ini file in your root folder. It must be like this.
 
-````
+```
 [Twitter]
 consumer_key = your_key
 consumer_secret = your_key
