@@ -8,6 +8,7 @@ A twitter spider to parse some twitter data.
 <strong>SQLAlchemy</strong> : pip install SQLAlchemy
 
 You need to create a config.ini file in your root folder. It must be like this.
+
 ````
 [Twitter]
 consumer_key = your_key
@@ -20,9 +21,11 @@ access_token_secret = your_key
 python app.py screen_name
 
 Example:
+
 ```
 python app.py google
 ```
+
 #Return result:
 
 ````
